@@ -1,0 +1,168 @@
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <iomanip>
+
+using namespace std;
+
+
+struct Videojuego {
+    string id; 
+    string titulo;
+    string genero;
+    float precio;
+    bool esMultijugador;
+
+   
+    void mostrar() const {
+        cout << "----------------------------------------\n";
+        cout << "ID: " << id << "\n";
+        cout << "Título: " << titulo << "\n";
+        cout << "Género: " << genero << "\n";
+        cout << "Precio: $" << fixed << setprecision(2) << precio << "\n";
+        cout << "Modo: " << (esMultijugador ? "Multijugador" : "Un solo jugador") << "\n";
+    }
+};
+
+
+template <typename T>
+class GenericService {
+public:
+    static void agregar(vector<T>& registro, T nuevoElemento);
+    static void mostrar(const vector<T>& registro);
+    static void eliminar(vector<T>& registro, const string& id);
+    static void buscar(const vector<T>& registro, const string& id);
+};
+
+template <typename T>
+void GenericService<T>::agregar(vector<T>& registro, T nuevoElemento) {
+    registro.push_back(nuevoElemento);
+    cout << "[ÉXITO] Agregado correctamente\n";
+}
+
+template <typename T>
+void GenericService<T>::mostrar(const vector<T>& registro) {
+    if (registro.empty()) {
+        cout << "No hay elementos registrados\n";
+        return;
+    }
+    for (const T& indice : registro) {
+        indice.mostrar(); 
+    }
+}
+
+template <typename T>
+void GenericService<T>::eliminar(vector<T>& registro, const string& id) {
+    for (size_t i = 0; i < registro.size(); i++) {
+        if (registro[i].id == id) {  
+            registro.erase(registro.begin() + i);
+            cout << "[ÉXITO] Eliminado correctamente\n";
+            return;
+        }
+    }
+    cout << "[ERROR] No encontrado\n";
+}
+
+template <typename T>
+void GenericService<T>::buscar(const vector<T>& registro, const string& id) {
+    for (const T& indice : registro) {
+        if (indice.id == id) {
+            cout << "\n------- Videojuego Encontrado -------\n";
+            indice.mostrar();
+            return;
+        }
+    }
+    cout << "[ERROR] No encontrado\n";
+}
+
+
+bool validarID(const string& id) {
+    return (id.rfind("COD", 0) == 0);
+}
+
+Videojuego capturarVideojuego() {
+    Videojuego nuevoJuego;
+    string idTemporal;
+    int opcionMulti;
+
+    cin.ignore(); 
+    
+    do {
+        cout << "-> Ingrese ID (Debe empezar con 'COD'): ";
+        getline(cin, idTemporal);
+        if (!validarID(idTemporal)) {
+            cout << "[ERROR] El ID debe iniciar estrictamente con 'COD'. Intente de nuevo.\n\n";
+        }
+    } while (!validarID(idTemporal));
+    
+    nuevoJuego.id = idTemporal;
+
+    cout << "-> Título: ";
+    getline(cin, nuevoJuego.titulo);
+
+    cout << "-> Género: ";
+    getline(cin, nuevoJuego.genero);
+
+    cout << "-> Precio: $";
+    cin >> nuevoJuego.precio;
+
+    do {
+        cout << "¿Es multijugador? (1 = Sí, 0 = No): ";
+        cin >> opcionMulti;
+    } while (opcionMulti != 0 && opcionMulti != 1);
+    
+    nuevoJuego.esMultijugador = (opcionMulti == 1);
+
+    return nuevoJuego;
+}
+
+
+int main() {
+    vector<Videojuego> dbVideojuegos; 
+    int opcion;
+    string idBusqueda;
+
+    do {
+        cout << "\n-----------------------------------\n";
+        cout << "  SISTEMA DE GESTIÓN DE VIDEOJUEGOS\n";
+        cout << "-----------------------------------\n";
+        cout << "1. Registrar Videojuego (Create)\n";
+        cout << "2. Mostrar Catálogo (Get All)\n";
+        cout << "3. Buscar por ID (Get ID)\n";
+        cout << "4. Eliminar Videojuego (Delete)\n";
+        cout << "5. Salir\n";
+        cout << "Seleccione una opción: ";
+        cin >> opcion;
+
+        switch (opcion) {
+            case 1: {
+                Videojuego juego = capturarVideojuego();
+                
+                GenericService<Videojuego>::agregar(dbVideojuegos, juego);
+                break;
+            }
+            case 2:
+                cout << "\n=== MOSTRANDO TODO EL REGISTRO ===\n";
+                GenericService<Videojuego>::mostrar(dbVideojuegos);
+                break;
+            case 3:
+                cout << "Ingrese el ID a buscar: ";
+                cin >> idBusqueda;
+                GenericService<Videojuego>::buscar(dbVideojuegos, idBusqueda);
+                break;
+            case 4:
+                cout << "Ingrese el ID del videojuego a eliminar: ";
+                cin >> idBusqueda;
+                GenericService<Videojuego>::eliminar(dbVideojuegos, idBusqueda);
+                break;
+            case 5:
+                cout << "\nSaliendo de la aplicación... ¡Suerte en la entrega de programación!\n";
+                break;
+            default:
+                cout << "\n[ERROR] Opción inválida. Intente de nuevo.\n";
+        }
+    } while (opcion != 5);
+
+    return 0;
+}
