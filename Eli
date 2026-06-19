@@ -21,4 +21,42 @@ struct Libro {
     }
 };
 
+#include <iostream>
+#include <vector>
+#include "Generic_Service.h"
+#include "Libro.h"
+
+using namespace std;
+
+int main() {
+    vector<Libro> catalogoLibros;
+
+    Libro l1 = {"L001", "Cien anos de soledad", "Gabriel Garcia Marquez", 1967};
+    Libro l2 = {"L002", "Don Quijote de la Mancha", "Miguel de Cervantes", 1605};
+    Libro l3 = {"L003", "El resplandor", "Stephen King", 1977};
+
+    cout << "--- AGREGANDO LIBROS ---\n";
+    GenericService<Libro>::agregar(catalogoLibros, l1);
+    GenericService<Libro>::agregar(catalogoLibros, l2);
+    GenericService<Libro>::agregar(catalogoLibros, l3);
+    cout << "\n";
+
+    cout << "--- MOSTRAR CATÁLOGO ---\n";
+    GenericService<Libro>::mostrar(catalogoLibros);
+    cout << "\n";
+
+    cout << "--- BUSCAR LIBRO ---\n";
+    GenericService<Libro>::buscar(catalogoLibros, "L002");
+    cout << "\n";
+
+    cout << "--- ELIMINAR LIBRO ---\n";
+    GenericService<Libro>::eliminar(catalogoLibros, "L001");
+    cout << "\n";
+
+    cout << "--- CATÁLOGO ACTUALIZADO ---\n";
+    GenericService<Libro>::mostrar(catalogoLibros);
+
+    return 0;
+}
+
 #endif
