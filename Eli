@@ -1,0 +1,24 @@
+#ifndef LIBRO_H
+#define LIBRO_H
+
+#include <string>
+#include <iostream>
+using namespace std;
+
+struct Libro {
+    string id; // Obligatorio para GenericService
+    string titulo;
+    string autor;
+    int anioPublicacion;
+
+    // Método obligatorio para GenericService
+    void mostrar() const {
+        cout << "ID: " << id << "\n";
+        cout << "Título: " << titulo << "\n";
+        cout << "Autor: " << autor << "\n";
+        cout << "Año: " << anioPublicacion << "\n";
+        cout << "---------------------------------\n";
+    }
+};
+
+#endif
