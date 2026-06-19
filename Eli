@@ -31,9 +31,9 @@ using namespace std;
 int main() {
     vector<Libro> catalogoLibros;
 
-    Libro l1 = {"L001", "Cien anos de soledad", "Gabriel Garcia Marquez", 1967};
+    Libro l1 = {"L001", "Alicia en el pais de las maravillas", "Lewis Carroll", 1865};
     Libro l2 = {"L002", "Don Quijote de la Mancha", "Miguel de Cervantes", 1605};
-    Libro l3 = {"L003", "El resplandor", "Stephen King", 1977};
+    Libro l3 = {"L003", "Las Cronicas de Narnia", "C.S. Lewis", 1950};
 
     cout << "--- AGREGANDO LIBROS ---\n";
     GenericService<Libro>::agregar(catalogoLibros, l1);
