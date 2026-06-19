@@ -1,0 +1,167 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <iomanip>
+
+using namespace std;
+
+// Estructura asignada a Leo
+struct Automovil {
+    string id;          // Debe empezar con "COD" y ser único
+    string marca;
+    string modelo;
+    int anio;
+    float precio;
+};
+
+// Prototipos de las funciones (Programación Estructurada)
+void menu();
+void registrarAutomovil();
+void mostrarAutomoviles();
+bool idExisteEnArchivo(string idBuscado);
+
+int main() {
+    // Arranca el programa llamando al menú principal
+    menu();
+    return 0;
+}
+
+void menu() {
+    int opcion;
+    do {
+        cout << "\n=== SISTEMA GESTOR DE AUTOMÓVILES ===\n";
+        cout << "1. Registrar Nuevo Automóvil\n";
+        cout << "2. Ver Lista de Automóviles Registrados\n";
+        cout << "3. Salir\n";
+        cout << "Seleccione una opción: ";
+        cin >> opcion;
+        cin.ignore(); // Limpia el buffer para evitar que se salte los strings
+
+        switch(opcion) {
+            case 1: 
+                registrarAutomovil(); 
+                break;
+            case 2: 
+                mostrarAutomoviles(); 
+                break;
+            case 3: 
+                cout << "Saliendo del sistema...\n"; 
+                break;
+            default: 
+                cout << "Opción no válida. Intente de nuevo.\n";
+        }
+    } while(opcion != 3);
+}
+
+// FUNCIÓN AUXILIAR: Revisa si el ID ya está escrito en el archivo .txt
+bool idExisteEnArchivo(string idBuscado) {
+    ifstream lectura;
+    lectura.open("autos.txt");
+    
+    // Si el archivo no existe aún, significa que el ID no está repetido
+    if (lectura.fail()) {
+        return false;
+    }
+
+    Automovil autoTemporal;
+    // Lee el archivo columna por columna buscando el ID
+    while (lectura >> autoTemporal.id >> autoTemporal.marca >> autoTemporal.modelo >> autoTemporal.anio >> autoTemporal.precio) {
+        if (autoTemporal.id == idBuscado) {
+            lectura.close();
+            return true; // Encontró el ID repetido
+        }
+    }
+    
+    lectura.close();
+    return false; // El ID está limpio, no se repite
+}
+
+// FUNCIÓN 1: Captura, valida y almacena los datos en el archivo
+void registrarAutomovil() {
+    Automovil miCoche;
+    bool idValido = false;
+
+    cout << "\n--- REGISTRO DE NUEVO AUTOMÓVIL ---\n";
+
+    // Bucle para obligar al usuario a meter un ID correcto y único
+    while (!idValido) {
+        cout << "Ingrese el ID (Debe empezar con 'COD'): ";
+        cin >> miCoche.id;
+
+        // VALIDACIÓN 1: Que empiece con "COD"
+        if (miCoche.id.length() >= 3 && miCoche.id[0] == 'C' && miCoche.id[1] == 'O' && miCoche.id[2] == 'D') {
+            
+            // VALIDACIÓN 2: Que el ID sea único (no repetido en el archivo)
+            if (idExisteEnArchivo(miCoche.id)) {
+                cout << "[Error]: Ese ID ya existe en el sistema. Ingrese uno diferente.\n\n";
+            } else {
+                idValido = true; // Pasó ambas pruebas
+            }
+            
+        } else {
+            cout << "[Error]: ID inválido. Debe incluir el prefijo 'COD' (Ejemplo: COD01, COD_AUTO).\n\n";
+        }
+    }
+
+    // Captura de los 4 atributos adicionales (sin espacios en marca/modelo para evitar fallas en archivos)
+    cout << "Marca (sin espacios, ej: Toyota): "; 
+    cin >> miCoche.marca;
+    
+    cout << "Modelo (sin espacios, ej: Corolla): "; 
+    cin >> miCoche.modelo;
+    
+    cout << "Año (ej: 2024): "; 
+    cin >> miCoche.anio;
+    
+    cout << "Precio ($): "; 
+    cin >> miCoche.precio;
+
+    // GUARDAR EN ARCHIVO DE TEXTO (Modo append para no borrar lo anterior)
+    ofstream escritura;
+    escritura.open("autos.txt", ios::app);
+
+    if (escritura.fail()) {
+        cout << "Error: No se pudo abrir el archivo para guardar.\n";
+        return;
+    }
+
+    // Escribimos los datos separados por espacios y con un salto de línea al final
+    escritura << miCoche.id << " " 
+              << miCoche.marca << " " 
+              << miCoche.modelo << " " 
+              << miCoche.anio << " " 
+              << miCoche.precio << "\n";
+
+    escritura.close();
+    cout << "\n¡Automóvil registrado y guardado con éxito en el archivo!\n";
+}
+
+// FUNCIÓN 2: Recupera los datos del archivo y los muestra en una tabla
+void mostrarAutomoviles() {
+    ifstream lectura;
+    lectura.open("autos.txt");
+
+    if (lectura.fail()) {
+        cout << "\n[Aviso]: No hay automóviles registrados todavía (El archivo no existe).\n";
+        return;
+    }
+
+    Automovil autoTemporal;
+    cout << "\n=======================================================\n";
+    cout << "             LISTA DE AUTOMÓVILES REGISTRADOS          \n";
+    cout << "=======================================================\n";
+    cout << left << setw(12) << "ID" << setw(15) << "Marca" << setw(15) << "Modelo" << setw(8) << "Año" << setw(10) << "Precio" << endl;
+    cout << "-------------------------------------------------------\n";
+
+    // Lee el archivo completo línea por línea
+    while (lectura >> autoTemporal.id >> autoTemporal.marca >> autoTemporal.modelo >> autoTemporal.anio >> autoTemporal.precio) {
+        cout << left << setw(12) << autoTemporal.id 
+             << setw(15) << autoTemporal.marca 
+             << setw(15) << autoTemporal.modelo 
+             << setw(8) << autoTemporal.anio 
+             << "$" << autoTemporal.precio << endl;
+    }
+
+    lectura.close();
+    cout << "=======================================================\n";
+}
